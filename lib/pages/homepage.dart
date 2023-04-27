@@ -14,33 +14,21 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late TabController _cuacaTabController;
   String _idWilayah = '501192';
-  late Future<List<WilayahModel>?> listWilayah;
-  late Future<List<CuacaModel>?> listCuaca;
 
   @override
   void initState() {
     _cuacaTabController = TabController(length: 2, vsync: this);
-    getDataCuaca();
     super.initState();
-  }
-
-  Future<void> getDataCuaca() async {
-    try {
-      listWilayah = WeatherRepository.getListWilayah();
-      listCuaca = WeatherRepository.getListCuacaByIdWilayah(_idWilayah);
-      setState(() {});
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(e.toString()),
-      ));
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: Future.wait([listWilayah, listCuaca]),
+        future: Future.wait([
+          WeatherRepository.getListWilayah(),
+          WeatherRepository.getListCuacaByIdWilayah(_idWilayah),
+        ]),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -148,10 +136,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                         visualDensity: VisualDensity.compact,
                                         onTap: () {
                                           Navigator.pop(context);
-                                          setState(() {
-                                            _idWilayah = item.id!;
-                                          });
-                                          getDataCuaca();
+                                          _idWilayah = item.id!;
+                                          setState(() {});
                                         },
                                       );
                                     },
